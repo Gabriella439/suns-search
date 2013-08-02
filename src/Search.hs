@@ -17,49 +17,11 @@ import Meld(meld)
 import Motif (MotifGraphs, motifsInStructure)
 import Pipes
 import Pipes.Core (Producer')
-import Primary (queryPrimary, PrimaryIndex)
+import Primary (PrimaryIndex)
 import Request (Request(Request))
-import Shuffle (Seed, shuffle)
+import Secondary (querySecondary)
 import Structure (atomsToStructure)
 import Timeout (Timeout, Milliseconds, runTimeoutP, tryIO)
-
-{- This duplicates some code from Secondary.hs because I might later want to
-   independently change how the query or secondary index behave.  The fact that
-   they currently behave identically is just a coincidence. -}
-queryToIndex
-   :: MotifGraphs
-   -> [Atom]
-   -> (VS.Vector Atom, V.Vector (V.Vector (VS.Vector Int)))
-queryToIndex parsers
-  = (id &&& motifsInStructure parsers . atomsToStructure) . VS.fromList
-
-queryPages
- :: (NFData pdbID)
- => MotifGraphs
- -> PrimaryIndex
- -> V.Vector (pdbID, VS.Vector Atom, V.Vector (V.Vector (VS.Vector Int)))
- -> Maybe Seed
- -> [Atom]
- -> ([Atom], [(pdbID, [Atom], [Atom])])
-queryPages parsers i1 i2 mSeed atoms = do
-    let (queryAtoms, queryMotifs) = queryToIndex parsers (meld atoms)
-        querySubset = map (queryAtoms VS.!) . sort . nub $ do
-            motif     <- V.toList queryMotifs
-            incidence <- V.toList motif
-            VS.toList incidence
-        candidates = case (queryPrimary i1 queryMotifs) of
-            Nothing    -> []
-            Just pages -> do
-                page <-
-                    (case mSeed of
-                        Nothing   -> id
-                        Just seed -> shuffle seed (S.size pages)
-                    ) (S.toList pages)
-                let (pdbID, pageAtoms, pageMotifs) = i2 V.! page
-                    context = VS.toList pageAtoms
-                map (\indices -> (pdbID, map (pageAtoms VS.!) indices, context))
-                  $ match queryMotifs pageMotifs
-     in (querySubset, candidates)
 
 pureSearch
  :: (NFData pdbID)
@@ -73,7 +35,7 @@ pureSearch parsers i1 i2 (Request rmsd nMax mSeed atoms)
   . take nMax
   . filter ((< rmsd) . snd)
   . aligner
-  . queryPages parsers i1 i2 mSeed
+  . querySecondary parsers i1 i2 mSeed
   $ atoms
 
 data Response a = Result a | Done | Timeout | Error String

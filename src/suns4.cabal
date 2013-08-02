@@ -29,6 +29,7 @@ Executable suns-index
         errors,
         filepath,
         hslogger,
+        MonadRandom,
         optparse-applicative,
         pipes >= 4.0.0 && < 4.1,
         text,
