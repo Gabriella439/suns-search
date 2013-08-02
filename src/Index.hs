@@ -5,8 +5,7 @@ import HSerialize (encodeFile)
 import Log (initLog, emergency)
 import Motif (numMotifs, motifsFromDir)
 import qualified Options.Applicative as O
-import Primary (primaryIndex)
-import Secondary (secondaryIndex)
+import Indices (primaryIndex, secondaryIndex)
 
 options :: O.Parser (String, String, String)
 options = (,,)

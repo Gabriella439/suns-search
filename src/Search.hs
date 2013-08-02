@@ -12,24 +12,23 @@ import Data.List (nub, sort)
 import qualified Data.Set as S
 import qualified Data.Vector as V
 import qualified Data.Vector.Storable as VS
+import Indices (PrimaryIndex, SecondaryIndex, querySecondary)
 import Kabsch (RMSD, aligner)
 import Meld(meld)
 import Motif (MotifGraphs, motifsInStructure)
+import PDB (PDBID)
 import Pipes
 import Pipes.Core (Producer')
-import Primary (PrimaryIndex)
 import Request (Request(Request))
-import Secondary (querySecondary)
 import Structure (atomsToStructure)
 import Timeout (Timeout, Milliseconds, runTimeoutP, tryIO)
 
 pureSearch
- :: (NFData pdbID)
- => MotifGraphs
+ :: MotifGraphs
  -> PrimaryIndex
- -> V.Vector (pdbID, VS.Vector Atom, V.Vector (V.Vector (VS.Vector Int)))
+ -> SecondaryIndex
  -> Request
- -> [(pdbID, [Atom])]
+ -> [(PDBID, [Atom])]
 pureSearch parsers i1 i2 (Request rmsd nMax mSeed atoms)
   = map fst
   . take nMax
@@ -51,13 +50,12 @@ timedList = go where
                 go (tail as)
 
 search
- :: (NFData pdbID)
- => MotifGraphs
+ :: MotifGraphs
  -> PrimaryIndex
- -> V.Vector (pdbID, VS.Vector Atom, V.Vector (V.Vector (VS.Vector Int)))
+ -> SecondaryIndex
  -> Maybe Milliseconds
  -> (key, Request)
- -> Producer (key, Response (pdbID, [Atom])) IO ()
+ -> Producer (key, Response (PDBID, [Atom])) IO ()
 search parsers i1 i2 timeout (key, req) = do
     let results = pureSearch parsers i1 i2 req
         answer  = do
