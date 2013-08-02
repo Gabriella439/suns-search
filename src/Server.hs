@@ -1,0 +1,87 @@
+-- | Top-level module for the server
+
+module Main
+    ( -- * Main
+      main
+    ) where
+
+import AMQP.Proxy (withAMQP, AMQPHandle(AMQPHandle))
+import Control.Applicative ((<$>), (<*>))
+import Control.DeepSeq (deepseq)
+import qualified Control.Exception as Ex
+import Data.Monoid (mconcat)
+import qualified Data.Text as T
+import HSerialize (decodeFile)
+import Log (initLog, emergency)
+import qualified Options.Applicative as O
+import Password (password)
+import Pipes
+import Search (search)
+import Structure () -- NFData Instance
+
+options :: O.Parser (String, String, Maybe Integer, T.Text)
+options = (,,,)
+ <$> (O.strOption $ mconcat
+    [ O.short 'n'
+    , O.long "node"
+    , O.metavar "NODE"
+    , O.value "127.0.0.1"
+    , O.showDefaultWith id
+    , O.completer (O.bashCompleter "hostname")
+    , O.help "AMQP node to connect to"
+    ] )
+ <*> (O.strOption $ mconcat
+    [ O.short 'i'
+    , O.long "index"
+    , O.metavar "DIR"
+    , O.value "index/"
+    , O.showDefaultWith id
+    , O.completer (O.bashCompleter "directory")
+    , O.help "Index directory"
+    ] )
+ <*> (O.nullOption $ mconcat
+    [ O.reader (fmap Just . O.auto)
+    , O.short 't'
+    , O.long "timeout"
+    , O.metavar "MILLISECONDS"
+    , O.value Nothing
+    , O.showDefaultWith (\_ -> "No timeout")
+    , O.help "Time limit for requests"
+    ] )
+ <*> (fmap T.pack $ O.strOption $ mconcat
+    [ O.short 'q'
+    , O.long "queue"
+    , O.metavar "QUEUE"
+    , O.value "1.0.0"
+    , O.showDefaultWith id
+    , O.help "Queue to serve"
+    ] )
+
+{-| Runs a long-lived search engine that connects to a message queue to receive
+    search requests and reply with search responses
+-}
+main = (do
+    (hostName, indexDir, timeout, version) <-
+        O.execParser $ O.info (O.helper <*> options) $ mconcat
+            [ O.fullDesc
+            , O.header "The Suns structural search engine"
+            , O.progDesc
+                "Connects to a message queue and handles search requests"
+            , O.footer "Report bugs to Gabriel439@gmail.com"
+            ]
+
+    initLog
+
+    pwd <- password
+
+    motifs <- decodeFile (indexDir ++ "/motifs.dat"         )
+    i1     <- decodeFile (indexDir ++ "/index_primary.dat"  )
+    i2     <- decodeFile (indexDir ++ "/index_secondary.dat")
+    motifs `deepseq` i1 `deepseq` i2 `deepseq` return ()
+
+    withAMQP hostName pwd version $ \(AMQPHandle requests respond) ->
+        run $ for requests (search motifs i1 i2 timeout ~> lift . respond)
+    emergency "Server connection lost" )
+  `Ex.catch` (\e -> do
+    emergency $ show (e :: Ex.IOException)
+    )

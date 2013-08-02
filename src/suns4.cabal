@@ -1,0 +1,74 @@
+Name: suns4
+Version: 1.0.0
+Build-Type: Simple
+Cabal-Version: >=1.14.0
+
+Executable suns-admin
+    Build-Depends:
+        base                 >= 4        && < 5  ,
+        amqp                 >= 0.4      && < 0.5,
+        errors               >= 1.4.0    && < 1.5,
+        haskeline            >= 0.7.0.0  && < 0.8,
+        hslogger             >= 1.2.0    && < 1.3,
+        optparse-applicative >= 0.5      && < 0.6,
+        transformers         >= 0.2.0.0  && < 0.4,
+        text                 >= 0.11.0.0 && < 0.12
+    Default-Language: Haskell98
+    GHC-Options: -O2
+    Main-Is: Admin.hs
+
+Executable suns-index
+    Build-Depends:
+        base >= 4 && <= 5,
+        array,
+        attoparsec,
+        bytestring,
+        containers,
+        deepseq,
+        directory == 1.1.0.2,
+        errors,
+        filepath,
+        hslogger,
+        optparse-applicative,
+        pipes >= 4.0.0 && < 4.1,
+        text,
+        text-format,
+        transformers,
+        unordered-containers,
+        vector >= 0.10
+    Default-Language: Haskell98
+    Other-Modules: Point, Atom
+    GHC-Options: -O2 -rtsopts
+    Main-Is: Index.hs
+
+Executable suns-server
+    Build-Depends:
+        base >= 4 && < 5,
+        aeson,
+        amqp,
+        array,
+        attoparsec,
+        bytestring,
+        containers,
+        deepseq,
+        directory == 1.1.0.2,
+        errors,
+        filepath,
+        haskeline >= 0.7.0.0 && < 0.8,
+        hmatrix,
+        hslogger,
+        mmorph >= 1.0.0 && < 1.1,
+        MonadRandom,
+        optparse-applicative,
+        pipes >= 4.0.0 && < 4.1,
+        pipes-concurrency >= 2.0.0 && < 2.1,
+        stm,
+        text,
+        text-format,
+        transformers,
+        unordered-containers,
+        vector >= 0.10
+    Other-Modules: Point, Atom
+    Default-Language: Haskell98
+    GHC-Options: -O2 -rtsopts
+    Main-Is: Server.hs
