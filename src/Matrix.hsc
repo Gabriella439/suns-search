@@ -1,9 +1,11 @@
+{-# LANGUAGE CPP, ForeignFunctionInterface #-}
+
 {-| The sole purpose of this module was to remove the dependency on `hmatrix`
     since UCSF does not allow publication of code that is GPLv3 licensed.  So
     there are lots of hacks in here.
 -}
 
-{-# LANGUAGE CPP, ForeignFunctionInterface #-}
+module Matrix where
 
 import qualified Data.Vector.Storable as V
 import Data.Vector.Storable ((!))
@@ -16,14 +18,14 @@ import Foreign.Marshal.Unsafe (unsafeLocalState)
 #include <cblas.h>
 #include <lapacke.h>
 
-data Matrix = Matrix
+data Matrix a = Matrix
     { buf        :: {-# UNPACK #-} !(V.Vector Double)
     , rows       :: {-# UNPACK #-} !Int
     , cols       :: {-# UNPACK #-} !Int
     }
     deriving (Show)
 
-instance Num Matrix where
+instance Num (Matrix a) where
     (Matrix buf1 rows1 cols1) - (Matrix buf2 rows2 cols2) =
         if (rows1 == rows2 && cols1 == cols2)
         then Matrix (V.zipWith (-) buf1 buf2) rows1 cols1
@@ -38,7 +40,7 @@ instance Num Matrix where
     fromInteger = error "fromInteger: Undefined for Matrix"
 
 -- Does not check that the inner lists all have the same length
-fromLists :: [[Double]] -> Matrix
+fromLists :: [[Double]] -> Matrix a
 fromLists xss = case xss of
     []     -> Matrix V.empty 0 0
     ys:yss ->
@@ -51,13 +53,13 @@ fromLists xss = case xss of
                         _  -> error "fromLists: Row lengths don't match"
         in  Matrix (V.fromList (concat (map check xss))) rs cs
 
-toLists :: Matrix -> [[Double]]
+toLists :: Matrix a -> [[Double]]
 toLists cs = chunksOf (cols cs) (V.toList (buf cs))
 
-scale :: Double -> Matrix -> Matrix
+scale :: Double -> Matrix a -> Matrix a
 scale n (Matrix b rs cs) = Matrix (V.map (n *) b) rs cs
 
-ones :: Int -> Int -> Matrix
+ones :: Int -> Int -> Matrix a
 ones m n = Matrix (V.replicate (m * n) 1) m n
 
 foreign import ccall "cblas.h cblas_dgemm" c_dgemm
@@ -91,7 +93,7 @@ clear p n = do
     c_memset p 0 (fromIntegral $ sizeOf (undefined :: CDouble) * n)
     return ()
 
-(<>) :: Matrix -> Matrix -> Matrix
+(<>) :: Matrix a -> Matrix a -> Matrix a
 (Matrix bufA rowsA colsA) <> (Matrix bufB rowsB colsB) =
     let 
     in  if (colsA == rowsB)
@@ -121,7 +123,7 @@ clear p n = do
                  return (Matrix bufC rowsA colsB)
         else error "(<>): Dimensions do not match"
 
-trans :: Matrix -> Matrix
+trans :: Matrix a -> Matrix a
 trans (Matrix buf_ rows_ cols_) =
     let buf' = V.generate (rows_ * cols_) $ \i ->
             let (r', c') = quotRem i rows_
@@ -145,7 +147,7 @@ foreign import ccall "lapacke.h LAPACKE_dgesvd" c_dgesvd
     -> IO Int
 
 -- TODO: Check 'info' return value of c_dgesvd
-svd :: Matrix -> (Matrix, Matrix, Matrix)
+svd :: Matrix a -> (Matrix a, Matrix a, Matrix a)
 svd (Matrix bufA rowsA colsA) = unsafeLocalState $ do
     let sizeU  = rowsA * rowsA
         sizeVT = colsA * colsA
@@ -195,7 +197,7 @@ c_lapackRowMajor = #const LAPACK_ROW_MAJOR
 -- LAPACK doesn't provide a way to compute determinants, so this is a big hack:
 -- Only compute the determinant for 3x3 matrices, since that is all that
 -- Kabsch.hs needs.
-det :: Matrix -> Double
+det :: Matrix a -> Double
 det (Matrix v rowsA colsA) =
     if (rowsA == 3 && colsA == 3)
     then   (v ! 0) * ((v ! 4) * (v ! 8) - (v ! 5) * (v ! 7))
@@ -203,15 +205,15 @@ det (Matrix v rowsA colsA) =
          + (v ! 2) * ((v ! 3) * (v ! 7) - (v ! 4) * (v ! 6))
     else error "det: Not a 3x3 matrix"
 
-mapMatrix :: (Double -> Double) -> Matrix -> Matrix
+mapMatrix :: (Double -> Double) -> Matrix a -> Matrix a
 mapMatrix f (Matrix bufA rowsA colsA) = Matrix (V.map f bufA) rowsA colsA
 
-sumElements :: Matrix -> Double
+sumElements :: Matrix a -> Double
 sumElements (Matrix bufA _ _) = V.sum bufA
 
 -- This is yet another hack that takes advantage of the fact that the second
 -- argument of `repmat` is always 1 in Kabsch.hs
-repmat :: Matrix -> Int -> Int -> Matrix
+repmat :: Matrix a -> Int -> Int -> Matrix a
 repmat (Matrix bufA rowsA colsA) n 1 = Matrix bufA' (rowsA * n) colsA
   where
     bufA' = V.generate (rowsA * colsA * n) $ \i ->

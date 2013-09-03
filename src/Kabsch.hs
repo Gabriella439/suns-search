@@ -11,9 +11,9 @@ module Kabsch (
 import Atom (Atom(point), distSqA)
 import Data.List (tails)
 import Data.Maybe (catMaybes)
-import qualified Numeric.LinearAlgebra as N
-import Numeric.LinearAlgebra ((<>), (><))
-import Numeric.LinearAlgebra.Util (ones)
+import qualified Matrix as N
+import Matrix ((<>))
+import Matrix (ones)
 import Point (pointToList, listToPoint)
 
 -- | Root-mean-square-deviation between two structures, in Ångstroms
@@ -45,10 +45,7 @@ params m2 m1 = -- Aligns m1 to m2
         a = N.trans m1' <> m2'
         (u, s, v) = N.svd a
         d = signum (N.det $ v <> N.trans u)
-        i = (3 >< 3) [
-            1, 0, 0,
-            0, 1, 0,
-            0, 0, d]
+        i = N.fromLists [[1, 0, 0], [0, 1, 0], [0, 0, d]]
         r = v <> i <> N.trans u
      in (m1c, m2c, r)
 
