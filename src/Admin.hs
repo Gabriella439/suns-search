@@ -5,11 +5,13 @@ import AMQP.Types (HostName, QueueName)
 import Control.Applicative ((<$>), (<*>))
 import Control.Exception (bracket)
 import Control.Error (scriptIO, runScript, (!?))
+import qualified Data.Map as M
 import Data.Monoid (mconcat, (<>))
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Log (initLog)
 import qualified Network.AMQP as A
+import qualified Network.AMQP.Types as A
 import qualified Options.Applicative as O
 import Password (Password, getPassword, password)
 import System.Environment (getArgs, getProgName)
@@ -75,10 +77,11 @@ main = runScript $ do
         
             let qName = "suns-queue-" <> queue
             AE.declareQueue channel $ A.QueueOpts
-                qName -- queueName
-                False -- queuePassive
-                True  -- queueDurable
-                False -- queueExclusive
-                False -- queueAutoDelete
+                qName                  -- queueName
+                False                  -- queuePassive
+                True                   -- queueDurable
+                False                  -- queueExclusive
+                False                  -- queueAutoDelete
+                (A.FieldTable M.empty) -- queueHeaders
         
             AE.bindQueue channel qName xName1 queue

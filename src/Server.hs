@@ -80,7 +80,7 @@ main = (do
     motifs `deepseq` i1 `deepseq` i2 `deepseq` return ()
 
     withAMQP hostName pwd version $ \(AMQPHandle requests respond) ->
-        run $ for requests (search motifs i1 i2 timeout ~> lift . respond)
+        runEffect $ for requests (search motifs i1 i2 timeout ~> lift . respond)
     emergency "Server connection lost" )
   `Ex.catch` (\e -> do
     emergency $ show (e :: Ex.IOException)

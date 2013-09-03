@@ -16,7 +16,7 @@ module Motif
 
 import Chemistry (ParseS, evalParseS, pMotif)
 import Control.Applicative (many)
-import Control.DeepSeq (NFData)
+import Control.DeepSeq (NFData(rnf))
 import Control.Monad (filterM, forM, msum)
 import qualified Data.ByteString as B
 import Data.List (isPrefixOf, isSuffixOf)
@@ -30,7 +30,8 @@ import System.FilePath.Posix ((</>))
 
 newtype MotifGraphs = MotifGraphs { unMotifGraphs :: [[Structure]] }
 
-instance NFData MotifGraphs
+instance NFData MotifGraphs where
+    rnf (MotifGraphs m) = rnf m
 
 instance HSerialize MotifGraphs where
     get = fmap MotifGraphs get

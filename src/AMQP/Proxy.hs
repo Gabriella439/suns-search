@@ -20,15 +20,17 @@ import Control.Error (note)
 import Control.Exception (bracket)
 import Control.Monad.Trans.Class (lift)
 import Data.Aeson (decode')
+import qualified Data.Map as M
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.Monoid ((<>))
 import Data.Text (Text)
 import Log (debug, warn)
 import qualified Network.AMQP as A
+import qualified Network.AMQP.Types as A
 import Password (Password, getPassword)
 import PDB (PDBID)
-import Pipes (Producer, yield, for, run)
+import Pipes (Producer, yield, for)
 import Request (Request)
 import Search (Response(..))
 
@@ -120,11 +122,12 @@ withAMQP hostName password version k = bracket
     
         let qName = "suns-queue-" <> version
         AE.declareQueue channel $ A.QueueOpts
-            qName -- queueName
-            True  -- queuePassive
-            True  -- queueDurable
-            False -- queueExclusive
-            False -- queueAutoDelete
+            qName                   -- queueName
+            True                    -- queuePassive
+            True                    -- queueDurable
+            False                   -- queueExclusive
+            False                   -- queueAutoDelete
+            (A.FieldTable M.empty)  -- queueHeaders
     
         listener <- listen connection channel qName A.Ack
         let close = A.closeConnection connection

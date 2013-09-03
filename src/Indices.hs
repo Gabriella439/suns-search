@@ -19,7 +19,7 @@ import Control.Monad (forM_)
 import Control.Monad.Trans.Class (lift)
 import Correspond (match)
 import qualified Data.ByteString as B
-import Control.DeepSeq (NFData)
+import Control.DeepSeq (NFData(rnf))
 import Data.List (isSuffixOf, nub, sort)
 import Data.Monoid (Monoid(mempty))
 import qualified Data.HashMap.Strict as H
@@ -42,7 +42,8 @@ import Util (groupOn)
 newtype PrimaryIndex = PrimaryIndex
     { unPrimaryIndex :: V.Vector (V.Vector (S.Set Int)) }
 
-instance NFData PrimaryIndex
+instance NFData PrimaryIndex where
+    rnf (PrimaryIndex i) = rnf i
 
 instance HSerialize PrimaryIndex where
     get = fmap PrimaryIndex get
@@ -111,7 +112,8 @@ newtype SecondaryIndex = SecondaryIndex
         :: V.Vector (PDBID, VS.Vector Atom, V.Vector (V.Vector (VS.Vector Int)))
     }
 
-instance NFData SecondaryIndex
+instance NFData SecondaryIndex where
+    rnf (SecondaryIndex i) = rnf i
 
 instance HSerialize SecondaryIndex where
     get = fmap SecondaryIndex get
@@ -138,7 +140,7 @@ secondaryIndex
  -> MotifGraphs
  -> IO SecondaryIndex
 secondaryIndex size pdbDir parsers = do
-    v <- runVector $ run $
+    v <- runVector $ runEffect $
          hoist lift (   filesToPageServer size pdbDir
                     >-> progress
                     >-> (for cat (yield . f . second (tokenize parsers)))

@@ -11,7 +11,7 @@ import Control.Monad (when, void)
 import Control.Monad.Trans.Class (lift)
 import qualified Network.AMQP as A
 import Pipes (Producer, yield, for)
-import Pipes.Concurrent (spawn, Buffer(Single), send, recv, forkIO, fromOutput)
+import Pipes.Concurrent (spawn, Buffer(Single), send, recv, forkIO, fromInput)
 
 {-| Listen to all messages from the given queue
 
@@ -25,15 +25,15 @@ listen
     -> A.Ack
     -> IO (Producer (A.Message, A.Envelope) IO ())
 listen connection channel queueName ack = do
-    (input , output ) <- spawn Single
-    (inKill, outKill) <- spawn Single
+    (output , input ) <- spawn Single
+    (outKill, inKill) <- spawn Single
     consumerTag <- A.consumeMsgs channel queueName ack $ \payload -> do
-        alive <- atomically $ send input payload
-        when (not alive) $ void $ atomically $ send inKill ()
+        alive <- atomically $ send output payload
+        when (not alive) $ void $ atomically $ send outKill ()
     forkIO $ do
-        atomically $ recv outKill
+        atomically $ recv inKill
         A.cancelConsumer channel consumerTag
-    return $ for (fromOutput output) $ \payload@(_, envelope) -> do
+    return $ for (fromInput input) $ \payload@(_, envelope) -> do
         yield payload
         lift $ case ack of
             A.Ack   -> A.ackEnv envelope
