@@ -4,10 +4,10 @@ The Suns protein search engine lets you perform fast all-atom searches on
 protein structures
 
 Note that the DeGrado lab hosts a public search engine which you can use for
-free at suns.degradolab.org.  The Suns PyMOL plugin and the `suns-cmd` command
-line tool both will send searches to this public server by default and if you
-are satisfied with that server you do not need to build your own server using
-this source package.
+free at `suns.degradolab.org`.  The Suns `PyMOL` plugin and the `suns-cmd`
+command line tool both will send searches to this public server by default and
+if you are satisfied with that server you do not need to build your own server
+using this source package.
 
 The main reasons you might want to build this package and host your own search
 engine are:
@@ -29,7 +29,7 @@ The search engine has two components:
 
 The **message queue** is what both clients and servers connect to, so you must
 install that on a computer that is accessible to both of them.  That means that
-if you are setting up a custom search engine and you want your PyMOL plugin or
+if you are setting up a custom search engine and you want your `PyMOL` plugin or
 `suns-cmd` program to talk to the search engine, you must point it to the
 address of the **message queue**, not the search engine.
 
@@ -40,11 +40,19 @@ there are a sufficient number of search engines to handle the request volume.
 
 ## Requirements
 
+* A `blas` installation (i.e. `libblas-dev`)
+* A `lapacke` installation (i.e. `liblapacke-dev`)
 * A properly configured `rabbitmq-server` installation (see below)
+* The Haskell Platform
+
+Debian is the easiest system to set up these dependencies:
+
+    # aptitude install libblas-dev \
+    >                  liblapacke-dev \
+    >                  rabbitmq-server \
+    >                  haskell-platform
 
 ## Installation
-
-First, install the [Haskell Platform](http://www.haskell.org/platform/).
 
     $ cabal update
     $ cabal install
@@ -67,11 +75,11 @@ Then, install `rabbitmq-server` and configure it by running the
 
 The `sh/suns-configure.sh` script will prompt you for two passwords:
 
-* The admin password that `suns-admin` uses
-* The server password that `suns-server` uses to connect to the message queue
+* The admin password that the `suns-admin` program uses
+* The server password that the `suns-server` program uses
 
 Then run `suns-admin`, entering the admin password.  This configures the
-necessary exchanges and queues to begin processing results:
+necessary exchanges and queues that the client and search engine need:
 
     ~/.cabal/bin/suns-admin
 
@@ -96,11 +104,15 @@ example, the `peptide_bond` motif has one file per residue, since it matches all
 twenty residue types.  Each match must have the same number of atoms and the
 atom order between matches must be consistent.
 
-Note that if you are using the PyMOL plugin and choose to customize the `motif`
-directory, you will also need to rebuild the PyMOL plugin to recognize the new
-motifs you have chosen.  This is because the PyMOL plugin uses the `motif`
-definitions to automatically expand selections to motifs.  See the PyMOL plugin
-build instructions for details on how to customize its behavior.
+Also note that motifs are indexed by bonds, not by atoms.  That means that you
+cannot define a single-atom motif and it also means that any non-bonded atoms
+will be ignored.
+
+Note that if you are using the `PyMOL` plugin and choose to customize the
+`motif` directory, you will also need to rebuild the `PyMOL` plugin to recognize
+the new motifs you have chosen.  This is because the `PyMOL` plugin uses the
+`motif` definitions to automatically expand selections to motifs.  See the
+`PyMOL` plugin build instructions for details on how to customize its behavior.
 
 If you are using the `suns-cmd` command line tool to search the database you do
 not need to rebuild it in response to changes to the `motif` directory.
@@ -143,8 +155,8 @@ queue you just configured.  If the message queue is located on a different
 computer use the `-n` option to specify its address.
 
 Once the search engine is running and connected to the message queue you can
-begin running searches.  Just point your PyMOL plugin or `suns-cmd` tool to the
-message queue's address and you can begin searching for protein structures.
+begin running searches.  Just point your `PyMOL` plugin or `suns-cmd` tool to
+the message queue's address and you can begin searching for protein structures.
 
 ## License (BSD 3-clause)
 
