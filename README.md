@@ -40,17 +40,17 @@ there are a sufficient number of search engines to handle the request volume.
 
 ## Requirements
 
-* A `blas` installation (i.e. `libblas-dev`)
-* A `lapacke` installation (i.e. `liblapacke-dev`)
-* A properly configured `rabbitmq-server` installation (see below)
+* A `blas` installation
+* A `lapacke` installation
 * The Haskell Platform
+* A properly configured `rabbitmq-server` installation (see below)
 
 Debian is the easiest system to set up these dependencies:
 
     # aptitude install libblas-dev \
     >                  liblapacke-dev \
-    >                  rabbitmq-server \
-    >                  haskell-platform
+    >                  haskell-platform \
+    >                  rabbitmq-server
 
 ## Installation
 
