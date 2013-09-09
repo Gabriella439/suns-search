@@ -4,6 +4,7 @@ Build-Type: Simple
 Cabal-Version: >=1.14.0
 
 Executable suns-admin
+    Hs-Source-Dirs: src
     Build-Depends:
         base                 >= 4        && < 5  ,
         amqp                 >= 0.4.1    && < 0.5,
@@ -19,6 +20,7 @@ Executable suns-admin
     Main-Is: Admin.hs
 
 Executable suns-index
+    Hs-Source-Dirs: src
     Build-Depends:
         base >= 4 && <= 5,
         array,
@@ -44,6 +46,7 @@ Executable suns-index
     Main-Is: Index.hs
 
 Executable suns-server
+    Hs-Source-Dirs: src
     Build-Depends:
         base >= 4 && < 5,
         aeson,
