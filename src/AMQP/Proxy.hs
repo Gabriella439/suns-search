@@ -19,6 +19,7 @@ import Control.Applicative ((<$>), (<*>))
 import Control.Error (note)
 import Control.Exception (bracket)
 import Control.Monad.Trans.Class (lift)
+import Control.Monad.Trans.Maybe (MaybeT(MaybeT))
 import Data.Aeson (decode')
 import qualified Data.Map as M
 import qualified Data.ByteString.Char8 as BS
@@ -30,7 +31,7 @@ import qualified Network.AMQP as A
 import qualified Network.AMQP.Types as A
 import Password (Password, getPassword)
 import PDB (PDBID)
-import Pipes (Producer, yield, for)
+import Pipes (Producer, yield, for, every)
 import Request (Request)
 import Search (Response(..))
 
@@ -39,16 +40,17 @@ import Search (Response(..))
 -}
 type Version = Text
 
-unwrapMessage
-    :: A.Message -> Producer ((RoutingKey, CorrelationID), Request) IO ()
-unwrapMessage message = do
+validMessage :: A.Message -> MaybeT IO ((RoutingKey, CorrelationID), Request)
+validMessage message = MaybeT $ do
     let correlationID = A.msgCorrelationID message
         e = (,)
          <$> (note "Message missing \"replyTo\" field" $ A.msgReplyTo message)
          <*> (note "Message parse failed" $ decode' $ A.msgBody $ message)
     case e of
-        Left  str            -> lift $ warn str
-        Right (replyTo, req) -> yield ((replyTo, correlationID), req)
+        Left   str           -> do
+            warn str
+            return Nothing
+        Right (replyTo, req) -> return $ Just ((replyTo, correlationID), req)
 
 publish
     :: A.Channel
@@ -75,6 +77,7 @@ publish channel exchangeName ((routingKey, correlationID), mAtoms) = do
             correlationID -- msgCorrelationID
             Nothing       -- msgHeaders
     A.publishMsg channel exchangeName routingKey message
+
 {-| A high-level wrapper around an AMQP connection providing a way to read
     client requests and respond with search results
 -}
@@ -136,7 +139,7 @@ withAMQP hostName password version k = bracket
                 { requests = for listener $ \(msg, _) -> do
                      lift $ debug $ (++ "\n") $ BL.unpack $ A.msgBody msg
                      lift $ debug "Waiting for a request"
-                     unwrapMessage msg
+                     every (validMessage msg)
                 , respond = publish channel xResps
                 }
             , close
