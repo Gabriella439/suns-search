@@ -45,20 +45,60 @@ type Tokenized = V.Vector (V.Vector (VS.Vector Int))
 -}
 match :: Tokenized -> Tokenized -> [[Int]]
 match query index = (`evalStateT` (M.empty, M.empty)) $ do
+
+    -- For each motif type (for both the query and index)
     forM_ (V.toList (V.zip query index)) $ \(qMotif, iMotif) -> do
+
+        -- For each match to the motif type (in the query)
         forM_ (V.toList qMotif) $ \qIncidence -> do
+
+            -- Select one match to the same motif type (from the index)
+            --
+            -- What may not be obvious to people unfamiliar with the
+            -- `StateT s []` monad is that this command causes the computation
+            -- to branch and each branch maintains its own independent state
+            -- that is totally isolated from the state of other branches.
             iIncidence <- lift $ V.toList iMotif
+
+            -- The following segment uses a "bimap" (i.e. a two-way map,
+            -- implemented as a pair of maps) to keep track of correspondences
+            -- between atoms in the index and the query.
+            --
+            -- Every time we match up a motif in the query with a motif in the
+            -- index we:
+            --
+            -- A) record correspondences between their atoms
+            -- B) ensure that these new correspondences are consistent with
+            --    previously established correspondences
+            --
+            -- Note that an index atom may match multiple query atoms because
+            -- we allow the query to contain duplicated atoms.  So we only
+            -- verify that:
+            -- 
+            -- A) each query atom matches EXACTLY one index atom
+            -- B) each index atom matches AT LEAST one query atom
             let l1 = VS.toList qIncidence
                 l2 = VS.toList iIncidence
             forM_ (zip l1 l2) $ \(qIx, iIx) -> do
                 (qMap, iMap) <- get
                 case (M.lookup qIx qMap, M.lookup iIx iMap) of
-                    (Nothing, Nothing) -> put (
-                        M.insert qIx iIx qMap,
-                        M.insert iIx qIx iMap)
+                    -- No previous matches, so no conflict
+                    (Nothing, Nothing) -> put
+                        ( M.insert qIx iIx qMap
+                        , M.insert iIx qIx iMap
+                        )
+                    -- Previous matches, so check for a conflict
                     (Just iIx', Just qIx')
+                        -- They are the same match, so we're all good
                         | qIx == qIx' && iIx == iIx' -> return ()
-                        | otherwise -> mzero
-                    (Nothing, Just qIx') -> put (M.insert qIx iIx qMap, iMap)
+                        -- They don't match, bail out of this solution
+                        | otherwise                  -> mzero
+                    -- One way match.  This is possible and valid because of
+                    -- duplicate query atoms.
+                    (Nothing, Just qIx') -> put
+                        ( M.insert qIx iIx qMap
+                        , iMap
+                        )
                     _ -> mzero
+
     gets (map snd . sortBy (comparing fst) . M.assocs . fst)
