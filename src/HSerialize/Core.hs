@@ -2,6 +2,12 @@
 
 {-| Fast serialization and deserialization specialized to 'Handle's.  The \'H\'
     in 'HSerialize' stands for 'Handle'
+
+    I do not use @binary@ or @cereal@ because they were both really slow the
+    last time I checked.  So I wrote a serialization interface specialized to
+    interacting with 'Handle's in 'IO'.  This improved performance 5-fold the
+    last time I measured it, but those libraries may have improved since then si
+    this solution may be obsolete.
 -}
 
 module HSerialize.Core (
