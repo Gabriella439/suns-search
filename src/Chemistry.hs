@@ -35,11 +35,23 @@ newtype ParseS a = ParseS { unParseS :: StateT Structure [] a }
 evalParseS :: ParseS a -> Structure -> [a]
 evalParseS p = evalStateT (unParseS p)
 
+{-| Match a bond from the current graph and remove it from the graph
+
+    'pBond' returns a pair of matched vertices in the same order as the argument
+    'AtomName's.
+-}
 pBond :: AtomName -> AtomName -> ParseS (Int, Int)
 pBond name1 name2 = ParseS $ StateT $ \(Structure gr as) -> do
+    -- Find all indices that match the first AtomName
     i1 <- VS.toList $ VS.findIndices (== name1) as
+
+    -- Find all neighbors of the first atom that match the second AtomName
     i2 <- filter (\i -> as VS.! i == name2) (gr ! i1)
+
+    -- Remove the matched bond from the graph
     let newGraph = deleteBond (i1, i2) gr
+
+    -- Return the bond and the updated graph
     return ((i1, i2), Structure newGraph as)
 
 {-| Match a motif from the current graph and remove it from the graph
@@ -49,14 +61,25 @@ pBond name1 name2 = ParseS $ StateT $ \(Structure gr as) -> do
 -}
 pMotif :: Structure -> ParseS (VS.Vector Int)
 pMotif (Structure bs as)
+    -- Use the State monad to keep track of matches
   = (`evalStateT` (V.replicate (VS.length as) Nothing)) $ do
+
+        -- foreach (i1, i2) in (bonds graph):
         forM_ (bonds bs) $ \(i1, i2) -> do
+
+            -- Match the bond
             (i1', i2') <- lift $ pBond (as VS.! i1) (as VS.! i2)
+
+            -- The match must be consistent with other matches
             matches    <- get
             let consistent i1 i1' = case (matches V.! i1) of
                     Nothing   -> True
                     Just iOld -> iOld == i1'
             guard $ consistent i1 i1' && consistent i2 i2'
+
+            -- Update the match list
             put $ matches V.// [(i1, Just i1'), (i2, Just i2')]
+
+        -- Return the final list of matches
         matchesFinal <- get
         fmap G.convert $ justZ $ T.sequence matchesFinal
