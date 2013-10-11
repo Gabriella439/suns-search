@@ -19,6 +19,12 @@ engine are:
 
 * The server at `suns.degradolab.org` is unavailable
 
+This package does **not** include either the Suns `PyMOL` plugin, nor the
+`suns-cmd` command line search tool.  Those are provided separately at:
+
+* `PyMOL` client: <http://degradolab.org/suns/>
+* `suns-cmd`: <https://github.com/Gabriel439/suns-cmd>
+
 ## Overview
 
 The search engine has two components:
