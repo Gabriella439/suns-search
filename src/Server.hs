@@ -78,6 +78,7 @@ options = (,,,)
 {-| Runs a long-lived search engine that connects to a message queue to receive
     search requests and reply with search responses
 -}
+main :: IO ()
 main = (do
     (hostName, indexDir, timeout, version) <-
         O.execParser $ O.info (O.helper <*> options) $ mconcat

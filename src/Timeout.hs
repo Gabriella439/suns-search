@@ -18,8 +18,19 @@
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
+{-| Utilities for timed computations, used to limit search requests to a fixed
+    amount of time
+-}
 module Timeout (
-    Milliseconds, Timeout(..), tryIO, runTimeout, runTimeoutP) where
+    -- * Timeouts
+    Timeout,
+
+    -- * Run timeouts
+    Milliseconds,
+    tryIO,
+    runTimeout,
+    runTimeoutP
+    ) where
 
 import Control.Applicative (Applicative, Alternative)
 import Control.Monad (MonadPlus, mzero)
@@ -36,9 +47,20 @@ import System.Timeout (timeout)
 type Milliseconds = Integer
 type Picoseconds  = Integer
 
+{-| The 'Timeout' monad keeps track of the total elapsed time since it began,
+    preventing computations from running past a final time point
+-}
+     
 newtype Timeout r = Timeout { unTimeout :: ReaderT Picoseconds (MaybeT IO) r }
     deriving (Functor, Applicative, Monad)
 
+{-| Try to run an 'IO' action
+
+    If the current 'Timeout' monad has exceeded its total allotted time, the
+    action will not run.  Otherwise the action will run, but will be constrained
+    to run within the remaining allotted time and will be interrupted if it
+    exceeds that time.
+-}
 tryIO :: IO r -> Timeout r
 tryIO io = do
     let liftIO     = Timeout . lift . lift
@@ -55,12 +77,19 @@ tryIO io = do
                 Just r  -> return r
         else liftMaybe mzero
 
+{-| Run a 'Timeout' monad, specifying the maximum time the timed computation may
+    use, interrupting the computation if it exceeds that allotted time.
+
+    Returns 'Nothing' if the computation is interrupted, and returns 'Just' if
+    the computation completes successfully within the allotted time
+-}
 runTimeout :: Milliseconds -> Timeout r -> IO (Maybe r)
 runTimeout duration m = do
     now <- getCPUTime
     let end = now + duration * 10^9
     runMaybeT $ runReaderT (unTimeout m) end
 
+-- | Unwrap a 'Timeout' monad buried within a pipe
 runTimeoutP
     :: Milliseconds -> Proxy a' a b' b Timeout r -> Proxy a' a b' b IO (Maybe r)
 runTimeoutP duration p = do

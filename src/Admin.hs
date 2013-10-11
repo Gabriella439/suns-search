@@ -16,7 +16,14 @@
    the Suns Search Engine.  If not, see <http://www.gnu.org/licenses/>.
 -}
 
+-- | Top-level module for the @suns-admin@ program
+
 {-# LANGUAGE OverloadedStrings #-}
+
+module Main (
+    -- * Main
+    main  
+    ) where
 
 import qualified AMQP.Error as AE
 import AMQP.Types (HostName, QueueName)
@@ -62,6 +69,10 @@ parserInfo = O.info (O.helper <*> options) $ mconcat
     , O.footer "Report bugs to Gabriel439@gmail.com"
     ]
 
+{-| Sets up the RabbitMQ server with the appropriate virtual host, exchanges,
+    and queues
+-}
+main :: IO ()
 main = runScript $ do
     Options hostName queue <- scriptIO $ O.execParser parserInfo
 

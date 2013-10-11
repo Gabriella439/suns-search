@@ -16,6 +16,8 @@
    the Suns Search Engine.  If not, see <http://www.gnu.org/licenses/>.
 -}
 
+-- | Core logic for creating and querying the search indices
+
 module Indices
     (
       -- * Primary Index
@@ -57,6 +59,9 @@ import System.Directory (getDirectoryContents)
 import System.FilePath.Posix ((</>))
 import Util (groupOn)
 
+{-| The forward index, used to rapidly eliminate structural 'Page's before
+    progressing to the more detailed checks in the secondary index
+-}
 newtype PrimaryIndex = PrimaryIndex
     { unPrimaryIndex :: V.Vector (V.Vector (S.Set Int)) }
 
@@ -124,7 +129,10 @@ queryPrimary (PrimaryIndex i1) iq
         i1
         (V.map V.length iq)
 
--- | Detailed index
+{-| The detailed index, which stores all details of the original structural
+    'Page's and also caches the locations of every motif advertised in the
+    forward index
+-}
 newtype SecondaryIndex = SecondaryIndex
     { unSecondaryIndex
         :: V.Vector (PDBID, VS.Vector Atom, V.Vector (V.Vector (VS.Vector Int)))

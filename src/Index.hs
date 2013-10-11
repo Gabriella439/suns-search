@@ -16,6 +16,13 @@
    the Suns Search Engine.  If not, see <http://www.gnu.org/licenses/>.
 -}
 
+-- | Top-level module for the @suns-index@ program
+
+module Main
+    ( -- * Main
+      main
+    ) where
+
 import Control.Applicative ((<$>), (<*>))
 import qualified Control.Exception as Ex
 import Data.Monoid (mconcat)
@@ -54,6 +61,11 @@ options = (,,)
     , O.help "Output index directory"
     ] )
 
+{-| Assembles the index, using the motif directory to specify the motifs to
+    recognize and the pdb directory to specify the structures to make
+    searchable.  Stores the result in the index directory.
+-}
+main :: IO ()
 main = (do
     (motifDir, pdbDir, indexDir) <-
         O.execParser $ O.info (O.helper <*> options) $ mconcat
