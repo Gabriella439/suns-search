@@ -16,7 +16,7 @@
    the Suns Search Engine.  If not, see <http://www.gnu.org/licenses/>.
 -}
 
--- | Top-level module for the server
+-- | Top-level module for the @suns-search@ program
 
 module Main
     ( -- * Main
