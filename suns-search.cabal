@@ -1,6 +1,8 @@
 Name: suns-search
 Version: 1.0.0
 Build-Type: Simple
+License: GPL-2
+License-File: LICENSE
 Cabal-Version: >=1.14.0
 
 Executable suns-admin
