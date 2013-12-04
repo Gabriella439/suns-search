@@ -29,10 +29,10 @@ module Kabsch (
 import Atom (Atom(point), distSqA)
 import Data.List (tails)
 import Data.Maybe (catMaybes)
-import qualified Matrix as N
-import Matrix ((<>))
-import Matrix (ones)
 import Point (pointToList, listToPoint)
+import qualified Numeric.LinearAlgebra as N
+import Numeric.LinearAlgebra ((<>))
+import Numeric.LinearAlgebra.Util (ones)
 
 -- | Root-mean-square-deviation between two structures, in Ångstroms
 type RMSD = Double

@@ -62,6 +62,7 @@ Executable suns-server
         errors,
         filepath,
         haskeline >= 0.7.0.0 && < 0.8,
+        hmatrix,
         hslogger,
         mmorph >= 1.0.0 && < 1.1,
         MonadRandom,
@@ -75,8 +76,7 @@ Executable suns-server
         transformers,
         unordered-containers,
         vector >= 0.10
-    Other-Modules: Point, Atom, Matrix
+    Other-Modules: Point, Atom
     Default-Language: Haskell98
     GHC-Options: -O2 -rtsopts
-    Extra-Libraries: lapacke blas
     Main-Is: Server.hs
