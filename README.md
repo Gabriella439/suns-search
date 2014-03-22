@@ -53,8 +53,7 @@ there are a sufficient number of search engines to handle the request volume.
 
 Debian is the easiest system to set up these dependencies:
 
-    # aptitude install libblas-dev \
-    >                  liblapacke-dev \
+    # aptitude install libgsl0-dev \
     >                  haskell-platform \
     >                  rabbitmq-server
 
