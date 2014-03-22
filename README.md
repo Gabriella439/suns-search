@@ -46,21 +46,23 @@ there are a sufficient number of search engines to handle the request volume.
 
 ## Requirements
 
-* A `blas` installation
-* A `lapacke` installation
+* `lapack`, `gsl`, `ncurses` installations with header files
 * The Haskell Platform
 * A properly configured `rabbitmq-server` installation (see below)
 
 Debian is the easiest system to set up these dependencies:
 
-    # aptitude install libgsl0-dev \
+    # aptitude install liblapack-dev \
+    >                  libgsl0-dev \
+    >                  ncurses-dev \
     >                  haskell-platform \
     >                  rabbitmq-server
 
 ## Installation
 
-    $ cabal update
-    $ cabal install
+    $ cabal update                 # Required after Haskell Platform install
+    $ cabal install cabal-install  # Get latest `cabal` (If using an old Haskell Platform)
+    $ ~/.cabal/bin/cabal install   # Install `suns-search` using updated `cabal`
 
 This produces three executables in your `~/.cabal/bin/` directory:
 
