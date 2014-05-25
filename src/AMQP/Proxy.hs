@@ -124,22 +124,24 @@ withAMQP hostName password version k = bracket
         channel <- A.openChannel connection
     
         let xReqs  = "suns-exchange-requests"
-        AE.declareExchange channel $ A.ExchangeOpts
-            xReqs    -- exchangeName
-            "direct" -- exchangeType
-            True     -- exchangePassive
-            True     -- exchangeDurable
-            False    -- exchangeAutoDelete
-            False    -- exchangeInternal
-    
+        AE.declareExchange channel $ A.newExchange
+            { A.exchangeName       = xReqs
+            , A.exchangeType       = "direct"
+            , A.exchangePassive    = True
+            , A.exchangeDurable    = True
+            , A.exchangeAutoDelete = False
+            , A.exchangeInternal   = False
+            }
+
         let xResps = "suns-exchange-responses"
-        AE.declareExchange channel $ A.ExchangeOpts
-            xResps   -- exchangeName
-            "direct" -- exchangeType
-            True     -- exchangePassive
-            True     -- exchangeDurable
-            False    -- exchangeAutoDelete
-            False    -- exchangeInternal
+        AE.declareExchange channel $ A.newExchange
+            { A.exchangeName       = xResps
+            , A.exchangeType       = "direct"
+            , A.exchangePassive    = True
+            , A.exchangeDurable    = True
+            , A.exchangeAutoDelete = False
+            , A.exchangeInternal   = False
+            }
     
         let qName = "suns-queue-" <> version
         AE.declareQueue channel $ A.QueueOpts
@@ -155,8 +157,8 @@ withAMQP hostName password version k = bracket
         return
             ( AMQPHandle
                 { requests = for listener $ \(msg, _) -> do
-                     lift $ debug $ (++ "\n") $ BL.unpack $ A.msgBody msg
-                     lift $ debug "Waiting for a request"
+--                   lift $ debug $ (++ "\n") $ BL.unpack $ A.msgBody msg
+--                   lift $ debug "Waiting for a request"
                      every (validMessage msg)
                 , respond = publish channel xResps
                 }

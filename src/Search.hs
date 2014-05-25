@@ -1,3 +1,5 @@
+{-# LANGUAGE RankNTypes #-}
+
 {- Copyright 2013 Gabriel Gonzalez
 
    This file is part of the Suns Search Engine

@@ -87,22 +87,24 @@ main = runScript $ do
             channel <- A.openChannel connection
         
             let xName1 = "suns-exchange-requests"
-            AE.declareExchange channel $ A.ExchangeOpts
-                xName1   -- exchangeName
-                "direct" -- exchangeType
-                False    -- exchangePassive
-                True     -- exchangeDurable
-                False    -- exchangeAutoDelete
-                False    -- exchangeInternal
-        
+            AE.declareExchange channel $ A.newExchange
+                { A.exchangeName       = xName1
+                , A.exchangeType       = "direct"
+                , A.exchangePassive    = False
+                , A.exchangeDurable    = True
+                , A.exchangeAutoDelete = False
+                , A.exchangeInternal   = False
+                }
+
             let xName2 = "suns-exchange-responses"
-            AE.declareExchange channel $ A.ExchangeOpts
-                xName2   -- exchangeName
-                "direct" -- exchangeType
-                False    -- exchangePassive
-                True     -- exchangeDurable
-                False    -- exchangeAutoDelete
-                False    -- exchangeInternal
+            AE.declareExchange channel $ A.newExchange
+                { A.exchangeName       = xName2
+                , A.exchangeType       = "direct"
+                , A.exchangePassive    = False
+                , A.exchangeDurable    = True
+                , A.exchangeAutoDelete = False
+                , A.exchangeInternal   = False
+                }
         
             let qName = "suns-queue-" <> queue
             AE.declareQueue channel $ A.QueueOpts
