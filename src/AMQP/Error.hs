@@ -28,7 +28,7 @@ module AMQP.Error
 import AMQP.Types (QueueName, ExchangeName, RoutingKey)
 import Control.Monad (when)
 import Data.Text (unpack)
-import Log (debug, warn)
+import Log (info, warn)
 import qualified Network.AMQP as A
 
 debugDeclareExchange :: ExchangeName -> String
@@ -40,7 +40,7 @@ debugDeclareExchange xName =
 declareExchange :: A.Channel -> A.ExchangeOpts -> IO ()
 declareExchange channel exchangeOpts = do
     A.declareExchange channel exchangeOpts
-    debug $ debugDeclareExchange (A.exchangeName exchangeOpts)
+    info $ debugDeclareExchange (A.exchangeName exchangeOpts)
 
 warnDeclareQueue :: QueueName -> QueueName -> String
 warnDeclareQueue name name' =
@@ -62,7 +62,7 @@ declareQueue channel queueOpts = do
     (qName', numMsg, numCons) <- A.declareQueue channel queueOpts
     let qName = A.queueName queueOpts
     when (qName' /= qName) $ warn $ warnDeclareQueue qName qName'
-    debug $ debugDeclareQueue qName numMsg numCons
+    info $ debugDeclareQueue qName numMsg numCons
 
 debugBindQueue :: QueueName -> ExchangeName -> RoutingKey -> String
 debugBindQueue qName xName routingKey =
@@ -74,4 +74,4 @@ debugBindQueue qName xName routingKey =
 bindQueue :: A.Channel -> QueueName -> ExchangeName -> RoutingKey -> IO ()
 bindQueue channel qName xName routingKey = do
     A.bindQueue channel qName xName routingKey
-    debug $ debugBindQueue qName xName routingKey
+    info $ debugBindQueue qName xName routingKey

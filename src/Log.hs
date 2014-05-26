@@ -24,6 +24,7 @@ module Log
 
       -- * Logging
     , debug
+    , info
     , warn
     , emergency
     ) where
@@ -43,10 +44,10 @@ import Prelude hiding (log)
 initLog :: IO ()
 initLog = do
     s <- openlog "suns-1.0.0" [PID] DAEMON L.WARNING
-    h <- streamHandler stderr L.DEBUG
+    h <- streamHandler stderr L.INFO
     let h' = setFormatter h (simpleLogFormatter "[$time] $msg") 
     L.updateGlobalLogger L.rootLoggerName $
-        L.setLevel L.DEBUG . L.addHandler h' . L.setHandlers [s]
+        L.setLevel L.INFO . L.addHandler h' . L.setHandlers [s]
 
 log :: L.Priority -> String -> IO ()
 log = L.logM L.rootLoggerName
@@ -54,6 +55,10 @@ log = L.logM L.rootLoggerName
 -- | Log at 'L.DEBUG' level
 debug :: String -> IO ()
 debug = log L.DEBUG
+
+-- | Log at 'L.INFO' level
+info :: String -> IO ()
+info = log L.INFO
 
 -- | Log at 'L.WARN' level
 warn :: String -> IO ()

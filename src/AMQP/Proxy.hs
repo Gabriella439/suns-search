@@ -36,6 +36,7 @@ import Atom (Atom, atomToRecord)
 import Control.Applicative ((<$>), (<*>))
 import Control.Error (note)
 import Control.Exception (bracket)
+import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Maybe (MaybeT(MaybeT))
 import Data.Aeson (decode')
 import qualified Data.Map as M
@@ -43,7 +44,7 @@ import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.Monoid ((<>))
 import Data.Text (Text)
-import Log (warn)
+import Log (debug, info, warn)
 import qualified Network.AMQP as A
 import qualified Network.AMQP.Types as A
 import Password (Password, getPassword)
@@ -156,8 +157,8 @@ withAMQP hostName password version k = bracket
         return
             ( AMQPHandle
                 { requests = for listener $ \(msg, _) -> do
---                   lift $ debug $ (++ "\n") $ BL.unpack $ A.msgBody msg
---                   lift $ debug "Waiting for a request"
+                     lift $ info "Request received"
+                     lift $ debug $ (++ "\n") $ BL.unpack $ A.msgBody msg
                      every (validMessage msg)
                 , respond = publish channel xResps
                 }
