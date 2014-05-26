@@ -24,12 +24,12 @@ module AMQP.Proxy.Core
     ) where
 
 import AMQP.Types (QueueName)
-import Control.Concurrent.STM (atomically)
 import Control.Monad (when, void)
 import Control.Monad.Trans.Class (lift)
 import qualified Network.AMQP as A
 import Pipes (Producer, yield, for)
-import Pipes.Concurrent (spawn, Buffer(Single), send, recv, forkIO, fromInput)
+import Pipes.Concurrent (
+    atomically, spawn, Buffer(Single), send, recv, forkIO, fromInput )
 
 {-| Listen to all messages from the given queue
 
