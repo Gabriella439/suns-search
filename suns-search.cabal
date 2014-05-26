@@ -19,7 +19,7 @@ Executable suns-admin
         transformers         >= 0.2.0.0  && < 0.4 ,
         text                 >= 0.11.0.0 && < 0.12
     Default-Language: Haskell98
-    GHC-Options: -O2
+    GHC-Options: -O2 -Wall
     Main-Is: Admin.hs
 
 Executable suns-index
@@ -45,7 +45,7 @@ Executable suns-index
         vector >= 0.10
     Default-Language: Haskell98
     Other-Modules: Point, Atom
-    GHC-Options: -O2 -rtsopts
+    GHC-Options: -O2 -rtsopts -Wall
     Main-Is: Index.hs
 
 Executable suns-server
@@ -79,5 +79,5 @@ Executable suns-server
         vector >= 0.10
     Other-Modules: Point, Atom
     Default-Language: Haskell98
-    GHC-Options: -O2 -rtsopts
+    GHC-Options: -O2 -rtsopts -Wall
     Main-Is: Server.hs
