@@ -10,7 +10,7 @@ module PDB
 
 import Atom (Atom(Atom, element), Prefix, Suffix)
 import AtomName (AtomName, bsToAtomName)
-import Control.Error (assertZ, headMay, justZ, rights)
+import Control.Error (assertZ, justZ, rights)
 import qualified Data.Attoparsec.Char8 as P
 import qualified Data.ByteString.Char8 as B
 import Element (Element, bsToElem)
@@ -19,7 +19,7 @@ import Point (Point(Point))
 -- | 4 letter PDB code
 type PDBID = String
 
-decimal' = P.skipSpace >> P.decimal
+double' :: P.Parser Double
 double'  = P.skipSpace >> P.double
 
 pPass1 :: P.Parser (AtomName, Element)
@@ -34,8 +34,8 @@ pPass1 = do
     atomName <- justZ $ bsToAtomName (B.append resName name)
     _        <- P.take 56
     element' <- P.take 2
-    element  <- justZ $ bsToElem element'
-    return (atomName, element)
+    element_ <- justZ $ bsToElem element'
+    return (atomName, element_)
 
 pPass2 :: P.Parser (Point, Prefix, Suffix)
 pPass2 = do
@@ -48,9 +48,9 @@ pPass2 = do
 
 parseAtom :: B.ByteString -> Either String Atom
 parseAtom str = do
-    (atomName, element)     <- P.parseOnly pPass1 str
+    (atomName, element_)     <- P.parseOnly pPass1 str
     (point, prefix, suffix) <- P.parseOnly pPass2 str
-    return $ Atom atomName point element prefix suffix
+    return $ Atom atomName point element_ prefix suffix
 
 -- | Convert a 'B.ByteString' representation of a PDB file to a list of 'Atom's
 pdbToAtoms :: B.ByteString -> [Atom]

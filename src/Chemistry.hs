@@ -90,9 +90,9 @@ pMotif (Structure bs as)
 
             -- The match must be consistent with other matches
             matches    <- get
-            let consistent i1 i1' = case (matches V.! i1) of
+            let consistent i j = case (matches V.! i) of
                     Nothing   -> True
-                    Just iOld -> iOld == i1'
+                    Just iOld -> iOld == j
             guard $ consistent i1 i1' && consistent i2 i2'
 
             -- Update the match list

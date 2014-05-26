@@ -113,7 +113,7 @@ match query index = (`evalStateT` (M.empty, M.empty)) $ do
                         | otherwise                  -> mzero
                     -- One way match.  This is possible and valid because of
                     -- duplicate query atoms.
-                    (Nothing, Just qIx') -> put
+                    (Nothing, Just _qIx') -> put
                         ( M.insert qIx iIx qMap
                         , iMap
                         )

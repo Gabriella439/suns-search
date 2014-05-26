@@ -57,9 +57,9 @@ atomsToEdges as = do
 
 atomsToStructure :: VS.Vector Atom -> Structure
 atomsToStructure as
-  = let graph = buildG (0, VS.length as - 1) (atomsToEdges as)
+  = let graph_ = buildG (0, VS.length as - 1) (atomsToEdges as)
         names = VS.map name as
-     in Structure graph names
+     in Structure graph_ names
 
 bonds :: Graph -> [Edge]
 bonds = filter (uncurry (<=)) . edges

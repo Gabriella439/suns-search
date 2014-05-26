@@ -38,7 +38,7 @@ module Atom
     ) where
 
 import Control.Applicative ((<$>), (<*>))
-import Control.DeepSeq (NFData(rnf))
+import Control.DeepSeq (NFData)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Data.Function (on)
@@ -118,15 +118,15 @@ instance Storable Atom where
      <*> #{peek atom, elem} p
      <*> (B.packCStringLen (#{ptr atom, prefix} p, 30))
      <*> (B.packCStringLen (#{ptr atom, suffix} p, 26))
-    poke p (Atom name r elem prefix suffix) = do
-        #{poke atom, name} p name
-        #{poke atom, r   } p r
-        #{poke atom, elem} p elem
-        B.useAsCStringLen prefix $ \(cstr, len) ->
+    poke p (Atom name_ r_ elem_ prefix_ suffix_) = do
+        #{poke atom, name} p name_
+        #{poke atom, r   } p r_
+        #{poke atom, elem} p elem_
+        B.useAsCStringLen prefix_ $ \(cstr, len) ->
             if (len == 30)
             then copyBytes (#{ptr atom, prefix} p) cstr 30
             else ioError $ userError "Atom: length prefix != 30"
-        B.useAsCStringLen suffix $ \(cstr, len) ->
+        B.useAsCStringLen suffix_ $ \(cstr, len) ->
             if (len == 26)
             then copyBytes (#{ptr atom, suffix} p) cstr 26
             else ioError $ userError "Atom: length suffix != 26"

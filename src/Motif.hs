@@ -32,7 +32,7 @@ module Motif
     , motifsInStructure
     ) where
 
-import Chemistry (ParseS, evalParseS, pMotif)
+import Chemistry (evalParseS, pMotif)
 import Control.Applicative (many)
 import Control.DeepSeq (NFData(rnf))
 import Control.Monad (filterM, forM, msum)

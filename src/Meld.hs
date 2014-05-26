@@ -50,7 +50,10 @@ import Data.List (tails)
 
 {- I chose this cutoff assuming no hydrogen atoms.  The smallest non-hydrogen
    bonds are C-C bonds of 1.2 Angstroms, so I rounded down to 1.0 to be safe -}
+cutoff :: Double
 cutoff = 1.0 -- Angstroms
+
+cutoffSq :: Double
 cutoffSq = cutoff * cutoff
 
 {-| Remove clashing atoms that share the same 'AtomName' and are within 1.0

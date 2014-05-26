@@ -59,6 +59,7 @@ bitsPerValue :: Int
 bitsPerValue = 21 -- The number of bits available to encode each dimension
 
 {-# INLINE unpack #-}
+unpack :: Word64 -> Word64
 unpack x0 = let x1 =  x0                   .&. 0x00000000001FFFFF
                 x2 = (x1 .|. shiftL x1 32) .&. 0x001F00000000FFFF
                 x3 = (x2 .|. shiftL x2 16) .&. 0x001F0000FF0000FF

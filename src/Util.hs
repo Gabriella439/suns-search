@@ -23,9 +23,9 @@ import Data.List (sortBy)
 import Data.Ord (comparing)
 
 factor :: (Ord a) => [(a, b)] -> [(a, [b])]
-factor abs = case abs of
+factor abs_ = case abs_ of
     []       -> []
-    (k, _):_ -> let (abs1, abs2) = span (\a -> fst a == k) abs
+    (k, _):_ -> let (abs1, abs2) = span (\a -> fst a == k) abs_
                  in (k, map snd abs1):factor abs2
 
 groupOn :: (Ord a) => (b -> a) -> [b] -> [[b]]

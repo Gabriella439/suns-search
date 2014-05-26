@@ -20,11 +20,9 @@
 
 module HSerialize (
     -- * Re-exports
-    module HSerialize.Core,
-    module HSerialize.Vector,
-    module HSerialize.Set
+    module HSerialize.Core
     ) where
 
 import HSerialize.Core
-import HSerialize.Vector
-import HSerialize.Set
+import HSerialize.Vector ()
+import HSerialize.Set ()

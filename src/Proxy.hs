@@ -19,7 +19,6 @@
 module Proxy (foldVector, runVector, progress) where
 
 import Control.Monad (forever)
-import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.State.Strict (StateT, execStateT, get, put)
 import Control.DeepSeq (NFData, ($!!))
 import Control.Monad.ST.Safe (RealWorld)
@@ -41,17 +40,17 @@ foldVector = forever $ do
                 liftIO $ VM.write mv nElem $!! a
                 liftState $ put (nElem + 1, size, mv)
   where
-    liftIO    = lift . lift
     liftState = lift
 
 runVector :: StateT (Int, Int, VM.MVector RealWorld a) IO r -> IO (V.Vector a)
 runVector sio = do
     mv <- VM.new 1
-    (nElem, size, mv') <- execStateT sio (0, 1, mv)
+    (nElem, _size, mv') <- execStateT sio (0, 1, mv)
     V.freeze (VM.slice 0 nElem mv')
 
 progress :: Pipe a a IO r
-progress = go 0 0 where
+progress = go 0 (0 :: Int)
+  where
     go len n = do
         a <- await
         let str = show n 
