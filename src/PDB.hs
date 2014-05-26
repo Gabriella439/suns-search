@@ -13,6 +13,7 @@ import AtomName (AtomName, bsToAtomName)
 import Control.Error (assertZ, justZ, rights)
 import qualified Data.Attoparsec.Char8 as P
 import qualified Data.ByteString.Char8 as B
+import Data.Monoid ((<>))
 import Element (Element, bsToElem)
 import Point (Point(Point))
 
@@ -31,7 +32,7 @@ pPass1 = do
     altLoc   <- P.anyChar
     assertZ (elem altLoc " A")
     resName  <- P.take 3
-    atomName <- justZ $ bsToAtomName (B.append resName name)
+    atomName <- justZ $ bsToAtomName (resName <> name)
     _        <- P.take 56
     element' <- P.take 2
     element_ <- justZ $ bsToElem element'
@@ -48,7 +49,7 @@ pPass2 = do
 
 parseAtom :: B.ByteString -> Either String Atom
 parseAtom str = do
-    (atomName, element_)     <- P.parseOnly pPass1 str
+    (atomName, element_)    <- P.parseOnly pPass1 str
     (point, prefix, suffix) <- P.parseOnly pPass2 str
     return $ Atom atomName point element_ prefix suffix
 

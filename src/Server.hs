@@ -28,7 +28,7 @@ import Control.Applicative ((<$>), (<*>))
 import Control.DeepSeq (deepseq)
 import qualified Control.Exception as Ex
 import Data.Monoid (mconcat)
-import qualified Data.Text as T
+import Data.Text (Text, pack)
 import HSerialize (decodeFile)
 import Log (initLog, emergency)
 import qualified Options.Applicative as O
@@ -37,7 +37,7 @@ import Pipes
 import Search (search)
 import Structure () -- NFData Instance
 
-options :: O.Parser (String, String, Maybe Integer, T.Text)
+options :: O.Parser (String, String, Maybe Integer, Text)
 options = (,,,)
  <$> (O.strOption $ mconcat
     [ O.short 'n'
@@ -66,7 +66,7 @@ options = (,,,)
     , O.showDefaultWith (\_ -> "No timeout")
     , O.help "Time limit for requests"
     ] )
- <*> (fmap T.pack $ O.strOption $ mconcat
+ <*> (fmap pack $ O.strOption $ mconcat
     [ O.short 'q'
     , O.long "queue"
     , O.metavar "QUEUE"
