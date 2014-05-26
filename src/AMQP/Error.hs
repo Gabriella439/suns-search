@@ -27,13 +27,13 @@ module AMQP.Error
 
 import AMQP.Types (QueueName, ExchangeName, RoutingKey)
 import Control.Monad (when)
-import qualified Data.Text as T
+import Data.Text (unpack)
 import Log (debug, warn)
 import qualified Network.AMQP as A
 
 debugDeclareExchange :: ExchangeName -> String
 debugDeclareExchange xName =
- "Declared exchange: \"" ++ T.unpack xName ++ "\""
+ "Declared exchange: \"" ++ unpack xName ++ "\""
 
 {-| Wrapper around 'A.declareExchange' that outputs additional debug information
 -}
@@ -45,12 +45,12 @@ declareExchange channel exchangeOpts = do
 warnDeclareQueue :: QueueName -> QueueName -> String
 warnDeclareQueue name name' =
  "'declareQueue' returned a new queue name\n\
- \    Requested queue name: '" ++ T.unpack name  ++ "'\n\
- \    Returned  queue name: '" ++ T.unpack name' ++ "'"
+ \    Requested queue name: '" ++ unpack name  ++ "'\n\
+ \    Returned  queue name: '" ++ unpack name' ++ "'"
 
 debugDeclareQueue :: QueueName -> Int -> Int -> String
 debugDeclareQueue queueName numMsg numCons =
- "Declared queue: \"" ++ T.unpack queueName ++ "\"\n\
+ "Declared queue: \"" ++ unpack queueName ++ "\"\n\
  \    " ++ show numMsg  ++ " messages in the queue\n\
  \    " ++ show numCons ++ " active consumers for the queue"
 
@@ -66,9 +66,9 @@ declareQueue channel queueOpts = do
 
 debugBindQueue :: QueueName -> ExchangeName -> RoutingKey -> String
 debugBindQueue qName xName routingKey =
- "Bound queue: \"" ++ T.unpack qName ++ "\"\n\
- \    to exchange: \"" ++ T.unpack xName      ++ "\"\n\
- \    with key   : \"" ++ T.unpack routingKey ++ "\""
+ "Bound queue: \"" ++ unpack qName ++ "\"\n\
+ \    to exchange: \"" ++ unpack xName      ++ "\"\n\
+ \    with key   : \"" ++ unpack routingKey ++ "\""
 
 -- | Wrapper around 'A.bindQueue' that outputs additional debug information
 bindQueue :: A.Channel -> QueueName -> ExchangeName -> RoutingKey -> IO ()

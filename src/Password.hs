@@ -39,14 +39,14 @@ module Password (Password, Password.getPassword, password) where
 import Control.Monad (when)
 import Control.Exception (throwIO)
 import Control.Monad.Trans.Class (lift)
-import qualified Data.Text as T
+import Data.Text (Text, pack)
 import System.Console.Haskeline (
     getPassword, runInputT, defaultSettings, haveTerminalUI )
 
 -- | User password
 newtype Password = Password
-    { getPassword :: T.Text
-      -- ^ Extract the password as 'T.Text'
+    { getPassword :: Text
+      -- ^ Extract the password as 'Text'
     }
 
 {-| Retrieve a password from standard input, displaying a prompt if connected to
@@ -58,6 +58,6 @@ password = runInputT defaultSettings $ do
     when interactive $ lift $ putStrLn "Enter server password:"
     mPassword <- System.Console.Haskeline.getPassword Nothing ""
     case mPassword of
-        Nothing -> lift $ throwIO $
+        Nothing  -> lift $ throwIO $
             userError "Failed to read password due to premature end of input"
-        Just password -> return $ Password (T.pack password)
+        Just pwd -> return $ Password (pack pwd)

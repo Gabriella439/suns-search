@@ -32,11 +32,9 @@ module Indices
     ) where
 
 import Atom (Atom, atomToPage)
-import Chemistry (ParseS)
 import Control.Arrow (second, (&&&))
 import Control.Error (maximumDef)
 import Control.Monad (forM_)
-import Control.Monad.Trans.Class (lift)
 import Correspond (match)
 import qualified Data.ByteString as B
 import Control.DeepSeq (NFData(rnf))
@@ -112,9 +110,9 @@ queryPrimary
  -> Maybe (S.Set Int)
 queryPrimary (PrimaryIndex i1) iq
   = V.foldl'
-        (\acc elem -> case acc of
-            Nothing -> elem
-            Just s1 -> case elem of
+        (\acc e -> case acc of
+            Nothing -> e
+            Just s1 -> case e of
                 Nothing -> acc
                 Just s2 -> Just $ S.intersection s1 s2 )
         Nothing
