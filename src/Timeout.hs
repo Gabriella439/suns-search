@@ -32,11 +32,9 @@ module Timeout (
     runTimeoutP
     ) where
 
-import Control.Applicative (Applicative, Alternative)
+import Control.Applicative (Applicative)
 import Control.Monad (MonadPlus, mzero)
-import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.Trans.Class (MonadTrans, lift)
-import Control.Monad.Morph (MFunctor)
 import Control.Monad.Trans.Maybe (MaybeT, runMaybeT)
 import Control.Monad.Trans.Reader (ReaderT, runReaderT, ask)
 import Pipes.Lift (runMaybeP, runReaderP)
@@ -68,7 +66,7 @@ tryIO io = do
         liftReader = Timeout
     now <- liftIO getCPUTime
     end <- liftReader ask
-    let remainder = fromIntegral $ (end - now) `div` 10^6 :: Int
+    let remainder = fromIntegral $ (end - now) `div` 10^(6::Int) :: Int
     if (remainder > 0)
         then do
             m <- liftIO $ timeout remainder io
@@ -86,7 +84,7 @@ tryIO io = do
 runTimeout :: Milliseconds -> Timeout r -> IO (Maybe r)
 runTimeout duration m = do
     now <- getCPUTime
-    let end = now + duration * 10^9
+    let end = now + duration * 10^(9::Int)
     runMaybeT $ runReaderT (unTimeout m) end
 
 -- | Unwrap a 'Timeout' monad buried within a pipe
@@ -94,5 +92,5 @@ runTimeoutP
     :: Milliseconds -> Proxy a' a b' b Timeout r -> Proxy a' a b' b IO (Maybe r)
 runTimeoutP duration p = do
     now <- lift getCPUTime
-    let end = now + duration * 10^9
+    let end = now + duration * 10^(9::Int)
     runMaybeP $ runReaderP end $ hoist unTimeout p

@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 {- Copyright 2013 Gabriel Gonzalez
 
    This file is part of the Suns Search Engine

@@ -49,15 +49,15 @@ distSq (Point x1 y1 z1) (Point x2 y2 z2) =
 
 -- | Convert a 'Point' to a list of three coordinates
 pointToList :: Point -> [Double]
-pointToList (Point x y z) = [x, y, z]
+pointToList (Point x_ y_ z_) = [x_, y_, z_]
 
 {-| Convert a list of three coordinates to a 'Point' or return 'Nothing' if the
     list does not have exactly three values
 -}
 listToPoint :: [Double] -> Maybe Point
 listToPoint cs = case cs of
-    [x, y, z] -> Just $ Point x y z
-    _         -> Nothing
+    [x_, y_, z_] -> Just $ Point x_ y_ z_
+    _            -> Nothing
 
 #def typedef struct {
     double x;
@@ -74,7 +74,7 @@ instance Storable Point where
      <$> #{peek point, x} p
      <*> #{peek point, y} p
      <*> #{peek point, z} p
-    poke p (Point x y z) = do
-        #{poke point, x} p x
-        #{poke point, y} p y
-        #{poke point, z} p z
+    poke p (Point x_ y_ z_) = do
+        #{poke point, x} p x_
+        #{poke point, y} p y_
+        #{poke point, z} p z_

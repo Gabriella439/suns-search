@@ -36,7 +36,6 @@ import Atom (Atom, atomToRecord)
 import Control.Applicative ((<$>), (<*>))
 import Control.Error (note)
 import Control.Exception (bracket)
-import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Maybe (MaybeT(MaybeT))
 import Data.Aeson (decode')
 import qualified Data.Map as M
@@ -44,12 +43,12 @@ import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.Monoid ((<>))
 import Data.Text (Text)
-import Log (debug, warn)
+import Log (warn)
 import qualified Network.AMQP as A
 import qualified Network.AMQP.Types as A
 import Password (Password, getPassword)
 import PDB (PDBID)
-import Pipes (Producer, yield, for, every)
+import Pipes (Producer, for, every)
 import Request (Request)
 import Search (Response(..))
 
@@ -152,7 +151,7 @@ withAMQP hostName password version k = bracket
             False                   -- queueAutoDelete
             (A.FieldTable M.empty)  -- queueHeaders
     
-        listener <- listen connection channel qName A.Ack
+        listener <- listen channel qName A.Ack
         let close = A.closeConnection connection
         return
             ( AMQPHandle

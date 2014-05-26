@@ -48,9 +48,13 @@ fromMatrix as m = zipWith
     as
     (catMaybes . map listToPoint . N.toLists $ m)
 
+mean :: N.Matrix Double -> N.Matrix Double
 mean m = let n = N.rows m in N.scale (1 / fromIntegral n) $ ones 1 n <> m
 
+(-:) :: N.Matrix Double -> N.Matrix Double -> N.Matrix Double
 m -: mc = m - N.repmat mc (N.rows m) 1
+
+(+:) :: N.Matrix Double -> N.Matrix Double -> N.Matrix Double
 m +: mc = m + N.repmat mc (N.rows m) 1
 
 -- Arguments are Nx3 matrices where each row is a coordinate
@@ -61,7 +65,7 @@ params m2 m1 = -- Aligns m1 to m2
         m1' = m1 -: m1c
         m2' = m2 -: m2c
         a = N.trans m1' <> m2'
-        (u, s, v) = N.svd a
+        (u, _s, v) = N.svd a
         d = signum (N.det $ v <> N.trans u)
         i = N.fromLists [[1, 0, 0], [0, 1, 0], [0, 0, d]]
         r = v <> i <> N.trans u
@@ -108,6 +112,7 @@ aligner (query, candidates)
                 ps   = params mq mrs
                 mrs' = align ps mrs
                 mrc' = align ps mrc
-                rmsd = sqrt $   N.sumElements (N.mapMatrix (^2) $ mrs' - mq)
-                              / fromIntegral (N.rows mrs')
+                rmsd = sqrt $
+                        N.sumElements (N.mapMatrix (^(2::Int)) $ mrs' - mq)
+                    /   fromIntegral (N.rows mrs')
              in ((pdbID, fromMatrix context mrc'), rmsd)

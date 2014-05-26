@@ -37,19 +37,18 @@ import Pipes.Concurrent (spawn, Buffer(Single), send, recv, forkIO, fromInput)
     each 'yield'.
 -}
 listen
-    :: A.Connection
-    -> A.Channel
+    :: A.Channel
     -> QueueName
     -> A.Ack
     -> IO (Producer (A.Message, A.Envelope) IO ())
-listen connection channel queueName ack = do
+listen channel queueName ack = do
     (output , input ) <- spawn Single
     (outKill, inKill) <- spawn Single
     consumerTag <- A.consumeMsgs channel queueName ack $ \payload -> do
         alive <- atomically $ send output payload
         when (not alive) $ void $ atomically $ send outKill ()
-    forkIO $ do
-        atomically $ recv inKill
+    _ <- forkIO $ do
+        _ <- atomically $ recv inKill
         A.cancelConsumer channel consumerTag
     return $ for (fromInput input) $ \payload@(_, envelope) -> do
         yield payload

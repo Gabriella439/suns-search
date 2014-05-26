@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 {- Copyright 2013 Gabriel Gonzalez
 
    This file is part of the Suns Search Engine
@@ -29,7 +31,7 @@ import Control.Monad.Trans.Reader (ReaderT(ReaderT))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as VM
 import qualified Data.Vector.Storable as VS
-import System.IO (Handle, hGetBuf, hPutBuf)
+import System.IO (hGetBuf, hPutBuf)
 import Foreign.Safe as F
 
 instance (Storable e) => HSerialize (VS.Vector e) where
@@ -43,7 +45,7 @@ instance (Storable e) => HSerialize (VS.Vector e) where
         let elsize = F.sizeOf (undefined :: e)
         ReaderT $ \h -> do
             fp <- F.mallocForeignPtrArray nelem
-            F.withForeignPtr fp $ \p -> hGetBuf h p (nelem * elsize)
+            _  <- F.withForeignPtr fp $ \p -> hGetBuf h p (nelem * elsize)
             return $ VS.unsafeFromForeignPtr0 fp nelem
 
 instance (HSerialize a) => HSerialize (V.Vector a) where

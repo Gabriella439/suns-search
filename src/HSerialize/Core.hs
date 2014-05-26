@@ -65,7 +65,7 @@ instance (F.Storable a) => HSerialize (Store a) where
     put n = ReaderT $ \h -> F.with (unStore n) $ \p ->
         IO.hPutBuf h p (F.sizeOf (undefined :: a))
     get   = ReaderT $ \h -> alloca $ \p -> do
-        IO.hGetBuf h p (F.sizeOf (undefined :: a))
+        _ <- IO.hGetBuf h p (F.sizeOf (undefined :: a))
         fmap Store $ F.peek p
 
 instance HSerialize Char where
