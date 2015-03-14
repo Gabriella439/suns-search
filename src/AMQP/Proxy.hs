@@ -85,15 +85,10 @@ publish channel exchangeName ((routingKey, correlationID), mAtoms) = do
                 ]
             Timeout               -> BL.singleton '2'
             Error str             -> BL.cons '3' (BL.pack str)
-        message = A.Message
-            body          -- msgBody
-            Nothing       -- msgDeliveryMode
-            Nothing       -- msgTimeStamp
-            Nothing       -- msgID
-            Nothing       -- msgContentType
-            Nothing       -- msgReplyTo
-            correlationID -- msgCorrelationID
-            Nothing       -- msgHeaders
+        message = A.newMsg
+            { A.msgBody = body
+            , A.msgCorrelationID = correlationID
+            }
     A.publishMsg channel exchangeName routingKey message
 
 {-| A high-level wrapper around an AMQP connection providing a way to read

@@ -23,6 +23,7 @@ module Request (Request(..)) where
 import Atom (Atom)
 import Control.Monad (mzero)
 import Data.Aeson (FromJSON(parseJSON), (.:), Value(Object))
+import Data.Text.Encoding (encodeUtf8)
 import PDB (pdbToAtoms)
 import Shuffle (Seed)
 
@@ -41,7 +42,7 @@ instance FromJSON Request where
         let _seed = case nSeed of
                 0 -> Nothing
                 _ -> Just nSeed
-        pdbStr     <- v .: "atoms"
+        pdbStr     <- fmap encodeUtf8 (v .: "atoms")
         let _atoms = pdbToAtoms pdbStr
         return $ Request _rmsd _numStruct _seed _atoms
     parseJSON _ = mzero
