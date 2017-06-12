@@ -89,7 +89,8 @@ publish channel exchangeName ((routingKey, correlationID), mAtoms) = do
             { A.msgBody = body
             , A.msgCorrelationID = correlationID
             }
-    A.publishMsg channel exchangeName routingKey message
+    _ <- A.publishMsg channel exchangeName routingKey message
+    return ()
 
 {-| A high-level wrapper around an AMQP connection providing a way to read
     client requests and respond with search results

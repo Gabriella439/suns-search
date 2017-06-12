@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 {- Copyright 2013 Gabriel Gonzalez
 
    This file is part of the Suns Search Engine
@@ -29,15 +31,19 @@ module Point
     ) where
 
 import Control.Applicative ((<$>), (<*>))
+import Control.DeepSeq (NFData)
 import Foreign.Safe (
     Storable(sizeOf, alignment, peek, poke, peekByteOff, pokeByteOff) )
+import GHC.Generics (Generic)
 
 -- | 3-dimensional point
 data Point = Point {
     x :: {-# UNPACK #-} !Double,
     y :: {-# UNPACK #-} !Double,
     z :: {-# UNPACK #-} !Double}
-    deriving (Show)
+    deriving (Generic, Show)
+
+instance NFData Point
 
 -- | Compute the distance between two 'Point's
 distSq :: Point -> Point -> Double

@@ -57,9 +57,8 @@ options = (,,,)
     , O.completer (O.bashCompleter "directory")
     , O.help "Index directory"
     ] )
- <*> (O.nullOption $ mconcat
-    [ O.reader (fmap Just . O.auto)
-    , O.short 't'
+ <*> (O.option (fmap Just O.auto) $ mconcat
+    [ O.short 't'
     , O.long "timeout"
     , O.metavar "MILLISECONDS"
     , O.value Nothing

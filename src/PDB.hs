@@ -30,7 +30,7 @@ pPass1 = do
     _        <- P.take 6
     name     <- P.take 4
     altLoc   <- P.anyChar
-    assertZ (elem altLoc " A")
+    assertZ (elem altLoc (" A" :: String))
     resName  <- P.take 3
     atomName <- justZ $ bsToAtomName (resName <> name)
     _        <- P.take 56

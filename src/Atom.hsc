@@ -23,6 +23,7 @@
     query without reserializing the entire 'Atom' back to a 'B.ByteString'.
 -}
 
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Atom
@@ -50,6 +51,7 @@ import Foreign.Safe (
     Storable(sizeOf, alignment, peek, peekByteOff, poke, pokeByteOff),
     copyBytes,
     plusPtr )
+import GHC.Generics (Generic)
 import HSerialize (HSerialize(get, put), Store(Store, unStore))
 import AtomName (AtomName)
 import Point (Point(x, y, z), distSq)
@@ -68,7 +70,7 @@ data Atom = Atom {
     element :: {-# UNPACK #-} !Element ,
     prefix  :: {-# UNPACK #-} !Prefix  ,
     suffix  :: {-# UNPACK #-} !Suffix  }
-    deriving (Show)
+    deriving (Generic, Show)
 
 instance HSerialize Atom where
     put = put . Store
@@ -106,8 +108,6 @@ atomToPage s = pointToPage s . point
     char prefix[30];
     char suffix[26];
 } atom;
-
-#let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
 
 instance Storable Atom where
     sizeOf    _ = #{size      atom}

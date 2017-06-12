@@ -32,7 +32,6 @@ import Data.Maybe (catMaybes)
 import Point (pointToList, listToPoint)
 import qualified Numeric.LinearAlgebra as N
 import Numeric.LinearAlgebra ((<>))
-import Numeric.LinearAlgebra.Util (ones)
 
 -- | Root-mean-square-deviation between two structures, in Ångstroms
 type RMSD = Double
@@ -49,7 +48,7 @@ fromMatrix as m = zipWith
     (catMaybes . map listToPoint . N.toLists $ m)
 
 mean :: N.Matrix Double -> N.Matrix Double
-mean m = let n = N.rows m in N.scale (1 / fromIntegral n) $ ones 1 n <> m
+mean m = let n = N.rows m in N.scale (1 / fromIntegral n) $ N.row (replicate n 1) <> m
 
 (-:) :: N.Matrix Double -> N.Matrix Double -> N.Matrix Double
 m -: mc = m - N.repmat mc (N.rows m) 1
@@ -64,15 +63,15 @@ params m2 m1 = -- Aligns m1 to m2
         m2c = mean m2
         m1' = m1 -: m1c
         m2' = m2 -: m2c
-        a = N.trans m1' <> m2'
+        a = N.tr' m1' <> m2'
         (u, _s, v) = N.svd a
-        d = signum (N.det $ v <> N.trans u)
+        d = signum (N.det $ v <> N.tr' u)
         i = N.fromLists [[1, 0, 0], [0, 1, 0], [0, 0, d]]
-        r = v <> i <> N.trans u
+        r = v <> i <> N.tr' u
      in (m1c, m2c, r)
 
 align :: Alignment -> N.Matrix Double -> N.Matrix Double
-align (m1c, m2c, r) m1 = ((m1 -: m1c) <> N.trans r) +: m2c
+align (m1c, m2c, r) m1 = ((m1 -: m1c) <> N.tr' r) +: m2c
 
 {-| Aligns a list of structures, represented as @(pdbID, substructure, full)@,
     where:
@@ -113,6 +112,6 @@ aligner (query, candidates)
                 mrs' = align ps mrs
                 mrc' = align ps mrc
                 rmsd = sqrt $
-                        N.sumElements (N.mapMatrix (^(2::Int)) $ mrs' - mq)
+                        N.sumElements (N.cmap (^(2::Int)) $ mrs' - mq)
                     /   fromIntegral (N.rows mrs')
              in ((pdbID, fromMatrix context mrc'), rmsd)
