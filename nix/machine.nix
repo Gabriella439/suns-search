@@ -55,7 +55,7 @@ in
     suns-server = {
       description = "Serve SUNS search requests";
 
-      wantedBy = [ "default.target" ];
+      wantedBy = [ "multi-user.target" ];
 
       after = [ "rabbitmq.service" ];
 
