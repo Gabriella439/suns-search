@@ -50,12 +50,20 @@ in
           touch ${setupCompletePath}
         fi
       '';
+
+      serviceConfig = {
+        Restart = "on-failure";
+
+        RestartSec = "10s";
+      };
     };
 
     suns-server = {
       description = "Serve SUNS search requests";
 
       wantedBy = [ "multi-user.target" ];
+
+      requires = [ "rabbitmq.service" ];
 
       after = [ "rabbitmq.service" ];
 
