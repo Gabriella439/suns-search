@@ -1,0 +1,2 @@
+{ machine = import ./machine.nix;
+}

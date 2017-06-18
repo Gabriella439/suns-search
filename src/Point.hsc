@@ -71,8 +71,6 @@ listToPoint cs = case cs of
     double z;
 } point;
 
-#let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
-
 instance Storable Point where
     sizeOf    _ = #{size      point}
     alignment _ = #{alignment point}
