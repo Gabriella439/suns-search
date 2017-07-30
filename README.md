@@ -107,9 +107,19 @@ the instructions here:
 
 * [http://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
 
+... and then saving your credentials to `~/.aws/credentials`, like so:
+
+```
+[default]
+aws_access_key_id     = AKIA...
+aws_secret_access_key = ...
+```
+
+Make sure that this `~/.aws/credentials` file is not world-readable!
+
 Modify the `nix/ec2.nix` to specify the AWS region and instance size you want
 to use.  The deployment uses `t2.micro` by default, which is eligible for 750
-hours of free tier usage.
+hours of [free tier usage](https://aws.amazon.com/free/faqs/).
 
 Once you are done, you can run:
 
