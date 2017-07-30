@@ -4,7 +4,7 @@
 
       virtualbox.headless = true;
 
-      virtualbox.memorySize = 4096;
+      virtualbox.memorySize = 2048;  # Increase this number for more memory
     };
   };
 }
