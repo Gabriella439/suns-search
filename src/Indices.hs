@@ -149,6 +149,7 @@ filesToPageServer size pdbDir = do
     files <- lift $ getDirectoryContents pdbDir
     let pdbFiles = filter (isSuffixOf ".pdb") files
     forM_ pdbFiles $ \pdbFile -> do
+        lift $ print pdbFile
         str <- lift $ B.readFile (pdbDir </> pdbFile)
         let pdbID       = take 4 pdbFile
             allAtoms    = pdbToAtoms str
@@ -166,7 +167,6 @@ secondaryIndex
 secondaryIndex size pdbDir parsers = do
     v <- runVector $ runEffect $
          hoist lift (   filesToPageServer size pdbDir
-                    >-> progress
                     >-> (for cat (yield . f . second (tokenize parsers)))
                     )
                     >-> foldVector
