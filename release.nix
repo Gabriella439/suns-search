@@ -9,19 +9,14 @@
 # ... and then Nix will supply the correct Haskell development environment for
 # you
 let
-  config = {
-    packageOverrides = pkgs: {
-      haskellPackages = pkgs.haskellPackages.override {
-        overrides = haskellPackagesNew: haskellPackagesOld: {
-          suns-search = haskellPackagesNew.callPackage ./default.nix { };
-        };
-      };
-    };
-  };
+  nixpkgs = import ./nix/nixpkgs.nix;
+
+  config = import ./nix/config.nix;
 
   pkgs =
-    import <nixpkgs> { inherit config; };
+    import nixpkgs { inherit config; };
 
 in
   { suns-search = pkgs.haskellPackages.suns-search;
+    nixops = pkgs.nixops;
   }

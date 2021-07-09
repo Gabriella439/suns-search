@@ -35,7 +35,7 @@ which you can find here:
 Then you must install the `nixops` deploy tool by running:
 
 ```bash
-$ nix-env --install --attr nixops --file '<nixpkgs>'
+$ nix-env --install --attr nixops --file ./release.nix
 ```
 
 ## Specify PDB files to index
