@@ -22,7 +22,7 @@ engine are:
 This package does **not** include either the Suns `PyMOL` plugin, nor the
 `suns-cmd` command line search tool.  Those are provided separately at:
 
-* `PyMOL` client: <http://degradolab.org/suns/>
+* `PyMOL` client: <https://doi.org/10.1371/journal.pcbi.1003750.s005>
 * `suns-cmd`: <https://github.com/Gabriel439/suns-cmd>
 
 ## Requirements
