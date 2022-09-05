@@ -1,4 +1,4 @@
-{- Copyright 2013 Gabriel Gonzalez
+{- Copyright 2013 Gabriella Gonzalez
 
    This file is part of the Suns Search Engine
 
@@ -72,7 +72,7 @@ main = (do
             [ O.fullDesc
             , O.header "The Suns structural search engine"
             , O.progDesc "Indexes PDB structures using the provided motifs"
-            , O.footer "Report bugs to Gabriel439@gmail.com"
+            , O.footer "Report bugs to Gabriella439@gmail.com"
             ]
     initLog
     motifs <- motifsFromDir motifDir

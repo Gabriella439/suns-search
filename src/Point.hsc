@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-{- Copyright 2013 Gabriel Gonzalez
+{- Copyright 2013 Gabriella Gonzalez
 
    This file is part of the Suns Search Engine
 

@@ -23,7 +23,7 @@ This package does **not** include either the Suns `PyMOL` plugin, nor the
 `suns-cmd` command line search tool.  Those are provided separately at:
 
 * `PyMOL` client: <https://doi.org/10.1371/journal.pcbi.1003750.s005>
-* `suns-cmd`: <https://github.com/Gabriel439/suns-cmd>
+* `suns-cmd`: <https://github.com/Gabriella439/suns-cmd>
 
 ## Requirements
 
@@ -190,7 +190,7 @@ $ nixops delete  --deployment suns
 
 ## License (GPLv2)
 
-Copyright 2013-2017 Gabriel Gonzalez
+Copyright 2013-2017 Gabriella Gonzalez
 
 This file is part of the Suns Search Engine
 

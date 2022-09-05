@@ -1,4 +1,4 @@
-{- Copyright 2013 Gabriel Gonzalez
+{- Copyright 2013 Gabriella Gonzalez
 
    This file is part of the Suns Search Engine
 
@@ -60,7 +60,7 @@ parserInfo = O.info (O.helper <*> options) $ mconcat
     [ O.fullDesc
     , O.header "The Suns setup utility"
     , O.progDesc "Sets up an AMQP node"
-    , O.footer "Report bugs to Gabriel439@gmail.com"
+    , O.footer "Report bugs to Gabriella439@gmail.com"
     ]
 
 {-| Sets up the RabbitMQ server with the appropriate virtual host, exchanges,

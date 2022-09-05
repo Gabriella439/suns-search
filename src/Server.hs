@@ -1,4 +1,4 @@
-{- Copyright 2013 Gabriel Gonzalez
+{- Copyright 2013 Gabriella Gonzalez
 
    This file is part of the Suns Search Engine
 
@@ -85,7 +85,7 @@ main = (do
             , O.header "The Suns structural search engine"
             , O.progDesc
                 "Connects to a message queue and handles search requests"
-            , O.footer "Report bugs to Gabriel439@gmail.com"
+            , O.footer "Report bugs to Gabriella439@gmail.com"
             ]
 
     initLog
